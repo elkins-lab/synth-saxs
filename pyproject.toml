@@ -1,0 +1,45 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synth-saxs"
+version = "0.1.0"
+description = "Education-focused SAXS profile simulation from protein coordinates"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "George Elkins", email = "george@example.com"}
+]
+keywords = [
+    "saxs",
+    "protein",
+    "structural-biology",
+    "biophysics",
+    "simulation",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python :: 3",
+]
+
+dependencies = [
+    "numpy>=1.26.4",
+    "biotite>=0.35.0",
+    "scipy>=1.7.0",
+]
+
+[project.optional-dependencies]
+viz = [
+    "matplotlib>=3.8.0",
+]
+test = [
+    "pytest>=7.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["synth_saxs*"]
