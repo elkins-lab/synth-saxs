@@ -27,7 +27,7 @@ def plot_saxs_results(
     plot_type: str = "standard",
     rg: float | None = None,
 ) -> Any:
-    """Generate SAXS plots (Standard, Kratky, or Guinier).
+    """Generate SAXS plots (Standard, Kratky, Guinier, or Porod).
 
     EDUCATIONAL RATIONALE:
     ----------------------
@@ -37,13 +37,14 @@ def plot_saxs_results(
     1. Standard (log I vs q): Shows the overall scattering decay.
     2. Kratky (q^2 * I vs q): Highly sensitive to the protein's folding state.
     3. Guinier (ln I vs q^2): Used to measure the overall size (Rg).
+    4. Porod (q^4 * I vs q): Used to analyze surface smoothness and compactness.
 
     Args:
         q: Scattering vector magnitudes.
         intensity: Scattering intensities I(q).
         title: Plot title.
         output_path: If provided, saves plot to file.
-        plot_type: 'standard', 'kratky', 'guinier', or 'all'.
+        plot_type: 'standard', 'kratky', 'guinier', 'porod', or 'all'.
         rg: Optional Radius of Gyration (A) to overlay on Guinier plot.
 
     Returns:
@@ -55,10 +56,11 @@ def plot_saxs_results(
         return None
 
     if plot_type == "all":
-        fig, axes = plt.subplots(1, 3, figsize=(15, 4))
-        _draw_standard_plot(axes[0], q, intensity, title)
-        _draw_kratky_plot(axes[1], q, intensity)
-        _draw_guinier_plot(axes[2], q, intensity, rg)
+        fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+        _draw_standard_plot(axes[0, 0], q, intensity, title)
+        _draw_kratky_plot(axes[0, 1], q, intensity)
+        _draw_guinier_plot(axes[1, 0], q, intensity, rg)
+        _draw_porod_plot(axes[1, 1], q, intensity)
     else:
         fig, ax = plt.subplots(figsize=(8, 5))
         if plot_type == "standard":
@@ -67,12 +69,45 @@ def plot_saxs_results(
             _draw_kratky_plot(ax, q, intensity, title)
         elif plot_type == "guinier":
             _draw_guinier_plot(ax, q, intensity, rg, title)
+        elif plot_type == "porod":
+            _draw_porod_plot(ax, q, intensity, title)
 
     plt.tight_layout()
 
     if output_path:
         plt.savefig(output_path, dpi=300)
         logger.info(f"SAXS plot saved to {output_path}")
+
+    return fig
+
+
+def plot_p_dist(
+    r: np.ndarray,
+    p_r: np.ndarray,
+    title: str = "Pair Distance Distribution P(r)",
+    output_path: str | None = None,
+) -> Any:
+    """Generate a P(r) plot.
+
+    Args:
+        r: Distance values (A).
+        p_r: P(r) values.
+        title: Plot title.
+        output_path: If provided, saves plot to file.
+
+    Returns:
+        The matplotlib figure object.
+    """
+    if not HAS_MATPLOTLIB:
+        return None
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    _draw_p_dist_plot(ax, r, p_r, title)
+    plt.tight_layout()
+
+    if output_path:
+        plt.savefig(output_path, dpi=300)
+        logger.info(f"P(r) plot saved to {output_path}")
 
     return fig
 
@@ -88,51 +123,49 @@ def _draw_standard_plot(ax: Any, q: np.ndarray, intensity: np.ndarray, title: st
 
 
 def _draw_kratky_plot(ax: Any, q: np.ndarray, intensity: np.ndarray, title: str = "") -> None:
-    """Dimensionless-style Kratky plot (q^2 * I(q) vs q).
-
-    EDUCATIONAL NOTE - The Kratky Plot:
-    ----------------------------------
-    The Kratky plot is used to assess the "compactness" or folding state of
-    a protein in solution.
-    - Folded Globular Proteins: Show a clear bell-shaped curve (peak) that
-      returns toward the baseline at high q. This is because I(q) for a sphere
-      decays faster than 1/q^2.
-    - Unfolded/Random Coil Proteins: Show a curve that continues to rise or
-      plateaus at high q. This indicates a lack of a well-defined compact core.
-    """
+    """Dimensionless-style Kratky plot (q^2 * I(q) vs q)."""
     kratky = (q**2) * intensity
     ax.plot(q, kratky, "r-", linewidth=2, label=r"$q^2 \cdot I(q)$")
     ax.set_xlabel(r"q ($\AA^{-1}$)", fontsize=12)
     ax.set_ylabel(r"$q^2 \cdot I(q)$", fontsize=12)
     ax.set_title(title or "Kratky Plot (Folding/Flexibility)", fontsize=13)
     ax.grid(True, linestyle="--", alpha=0.5)
+    ax.legend()
 
-    # Note on interpretation
-    # A bell shape indicates a folded globular protein.
-    # A rising curve at high q indicates an unfolded/flexible ensemble.
+
+def _draw_porod_plot(ax: Any, q: np.ndarray, intensity: np.ndarray, title: str = "") -> None:
+    """Porod plot (q^4 * I(q) vs q)."""
+    porod = (q**4) * intensity
+    ax.plot(q, porod, "m-", linewidth=2, label=r"$q^4 \cdot I(q)$")
+    ax.set_xlabel(r"q ($\AA^{-1}$)", fontsize=12)
+    ax.set_ylabel(r"$q^4 \cdot I(q)$", fontsize=12)
+    ax.set_title(title or "Porod Plot (Surface)", fontsize=13)
+    ax.grid(True, linestyle="--", alpha=0.5)
     ax.legend()
 
 
 def _draw_guinier_plot(
     ax: Any, q: np.ndarray, intensity: np.ndarray, rg: float | None = None, title: str = ""
 ) -> None:
-    """Guinier plot (ln(I) vs q^2) for Rg estimation.
+    """Guinier plot (ln(I) vs q^2) for Rg estimation."""
+    # Heuristic: try to find a region where q*Rg < 1.3
+    # If Rg is not known, use a conservative low-q range
+    if rg:
+        q_limit = 1.3 / rg
+        mask = q <= q_limit
+    else:
+        # Default to first 10 points or 10%
+        mask = np.zeros_like(q, dtype=bool)
+        mask[: max(5, len(q) // 10)] = True
 
-    EDUCATIONAL NOTE - The Guinier Approximation:
-    --------------------------------------------
-    At very low scattering angles (low q), the scattering intensity can be
-    approximated as:
-    I(q) ~ I(0) * exp(-q^2 * Rg^2 / 3)
+    # Filter out q=0 for log
+    mask = mask & (q > 1e-6)
+    q_low = q[mask]
+    i_low = intensity[mask]
 
-    By plotting ln(I) vs q^2, we get a straight line in the low-q region.
-    The slope of this line is -Rg^2 / 3. This is the most common method
-    for determining the Radius of Gyration (Rg) of a protein in solution.
-    """
-    # Only use the low-q region (q*Rg < 1.3)
-    # Since we don't always know Rg, we take the first 10% of points as a heuristic
-    cut = max(5, len(q) // 10)
-    q_low = q[:cut]
-    i_low = intensity[:cut]
+    if len(q_low) < 3:
+        ax.text(0.5, 0.5, "Insufficient points for Guinier fit", ha="center")
+        return
 
     q2 = q_low**2
     ln_i = np.log(i_low)
@@ -140,11 +173,10 @@ def _draw_guinier_plot(
     ax.plot(q2, ln_i, "go", markersize=4, label="Low-q Data")
 
     # Linear fit
-    if len(q2) > 2:
-        slope, intercept = np.polyfit(q2, ln_i, 1)
-        rg_est = np.sqrt(-3 * slope)
-        fit_line = slope * q2 + intercept
-        ax.plot(q2, fit_line, "k--", alpha=0.7, label=rf"Fit ($R_g \approx {rg_est:.2f} \AA$)")
+    slope, intercept = np.polyfit(q2, ln_i, 1)
+    rg_est = np.sqrt(max(0, -3 * slope))
+    fit_line = slope * q2 + intercept
+    ax.plot(q2, fit_line, "k--", alpha=0.7, label=rf"Fit ($R_g \approx {rg_est:.2f} \AA$)")
 
     if rg is not None:
         ax.annotate(
@@ -157,5 +189,16 @@ def _draw_guinier_plot(
     ax.set_xlabel(r"$q^2$ ($\AA^{-2}$)", fontsize=12)
     ax.set_ylabel("ln I(q)", fontsize=12)
     ax.set_title(title or "Guinier Plot", fontsize=13)
+    ax.grid(True, linestyle="--", alpha=0.5)
+    ax.legend()
+
+
+def _draw_p_dist_plot(ax: Any, r: np.ndarray, p_r: np.ndarray, title: str = "") -> None:
+    """P(r) distribution plot."""
+    ax.plot(r, p_r, "k-", linewidth=2, label="P(r)")
+    ax.fill_between(r, p_r, color="gray", alpha=0.3)
+    ax.set_xlabel(r"r ($\AA$)", fontsize=12)
+    ax.set_ylabel("P(r)", fontsize=12)
+    ax.set_title(title or "Pair Distance Distribution", fontsize=13)
     ax.grid(True, linestyle="--", alpha=0.5)
     ax.legend()

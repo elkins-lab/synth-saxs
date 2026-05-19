@@ -4,12 +4,14 @@ Small-Angle X-ray Scattering (SAXS) Simulation for Structural Biology.
 
 from .engine import (
     SaxsSimulator,
+    add_noise,
+    calculate_p_dist,
     calculate_radius_of_gyration,
     calculate_saxs_profile,
     export_saxs_profile,
     get_form_factor,
 )
-from .visualization import plot_saxs_results
+from .visualization import plot_p_dist, plot_saxs_results
 
 __all__ = [
     "calculate_saxs_profile",
@@ -18,4 +20,7 @@ __all__ = [
     "SaxsSimulator",
     "export_saxs_profile",
     "plot_saxs_results",
+    "calculate_p_dist",
+    "add_noise",
+    "plot_p_dist",
 ]
