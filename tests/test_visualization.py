@@ -64,3 +64,65 @@ def test_plot_saxs_results_no_matplotlib():
         m.setattr(synth_saxs.visualization, "HAS_MATPLOTLIB", False)
         fig = plot_saxs_results(np.array([0.1]), np.array([1.0]))
         assert fig is None
+
+
+def test_plot_saxs_results_porod(tmp_path):
+    """Test Porod plot."""
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        pytest.skip("matplotlib not installed")
+
+    q = np.linspace(0.01, 0.5, 50)
+    intensity = 1.0 / (q**4)
+
+    output_path = str(tmp_path / "saxs_porod.png")
+    fig = plot_saxs_results(q, intensity, output_path=output_path, plot_type="porod")
+    assert fig is not None
+    assert os.path.exists(output_path)
+
+
+def test_plot_saxs_results_all(tmp_path):
+    """Test 'all' plot type."""
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        pytest.skip("matplotlib not installed")
+
+    q = np.linspace(0.01, 0.5, 50)
+    intensity = np.exp(-(q**2) * 100)
+
+    output_path = str(tmp_path / "saxs_all.png")
+    fig = plot_saxs_results(q, intensity, output_path=output_path, plot_type="all")
+    assert fig is not None
+    assert os.path.exists(output_path)
+
+
+def test_plot_p_dist(tmp_path):
+    """Test P(r) plot."""
+    from synth_saxs.visualization import plot_p_dist
+
+    try:
+        import matplotlib.pyplot as plt
+    except ImportError:
+        pytest.skip("matplotlib not installed")
+
+    r = np.linspace(0, 100, 50)
+    p_r = r**2 * np.exp(-(r**2) / 1000)
+
+    output_path = str(tmp_path / "p_dist.png")
+    fig = plot_p_dist(r, p_r, output_path=output_path)
+    assert fig is not None
+    assert os.path.exists(output_path)
+
+
+def test_plot_p_dist_no_matplotlib():
+    """Verify graceful failure for plot_p_dist when matplotlib is missing."""
+    from synth_saxs.visualization import plot_p_dist
+
+    with pytest.MonkeyPatch().context() as m:
+        import synth_saxs.visualization
+
+        m.setattr(synth_saxs.visualization, "HAS_MATPLOTLIB", False)
+        fig = plot_p_dist(np.array([0.1]), np.array([1.0]))
+        assert fig is None

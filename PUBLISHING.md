@@ -35,10 +35,20 @@ The repository is configured to automatically publish to PyPI when a **GitHub Re
 2.  Update the version in `pyproject.toml`.
 3.  Create and publish a new Release on GitHub.
 
-## Versioning
-Follow Semantic Versioning (`MAJOR.MINOR.PATCH`).
-Update the version in `pyproject.toml`:
-```toml
-[project]
-version = "0.1.1"
-```
+## Bioconda Publishing
+
+`synth-saxs` is also published on Bioconda. The recipe is maintained in a fork of `bioconda-recipes`.
+
+### 1. Update the Recipe
+The local copy of the recipe is in `bioconda_recipe/`. When a new version is released on PyPI:
+1.  Update `version` and `sha256` in `bioconda_recipe/meta.yaml`.
+2.  Copy the recipe to your `bioconda-recipes` fork:
+    ```bash
+    cp bioconda_recipe/* ../bioconda-recipes/recipes/synth-saxs/
+    ```
+
+### 2. Submit to Bioconda
+1.  Go to your local `bioconda-recipes` clone.
+2.  Create a new branch for the release.
+3.  Commit the changes and push to your fork.
+4.  Open a Pull Request on the main [bioconda-recipes](https://github.com/bioconda/bioconda-recipes) repository.

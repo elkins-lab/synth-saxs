@@ -45,3 +45,6 @@ venv.env/
 
 # Documentation
 site/
+
+# Bioconda
+bioconda_recipe/
