@@ -41,7 +41,7 @@
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, cast
 
 import biotite.structure as struc
 import numpy as np

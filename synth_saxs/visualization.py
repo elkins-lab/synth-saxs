@@ -4,7 +4,7 @@ Provides plotting capabilities for I(q), Kratky, and Guinier plots.
 """
 
 import logging
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any
 
 import numpy as np
 

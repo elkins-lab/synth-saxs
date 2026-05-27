@@ -1,13 +1,15 @@
 import os
-import pytest
+
 import numpy as np
+import pytest
+
 from synth_saxs import plot_saxs_results
 
 
 def test_plot_saxs_results_standard(tmp_path):
     """Test standard SAXS plot."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 
@@ -23,7 +25,7 @@ def test_plot_saxs_results_standard(tmp_path):
 def test_plot_saxs_results_kratky(tmp_path):
     """Test Kratky plot."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 
@@ -39,7 +41,7 @@ def test_plot_saxs_results_kratky(tmp_path):
 def test_plot_saxs_results_guinier(tmp_path):
     """Test Guinier plot and Rg estimation logic."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 
@@ -69,7 +71,7 @@ def test_plot_saxs_results_no_matplotlib():
 def test_plot_saxs_results_porod(tmp_path):
     """Test Porod plot."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 
@@ -85,7 +87,7 @@ def test_plot_saxs_results_porod(tmp_path):
 def test_plot_saxs_results_all(tmp_path):
     """Test 'all' plot type."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 
@@ -103,7 +105,7 @@ def test_plot_p_dist(tmp_path):
     from synth_saxs.visualization import plot_p_dist
 
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 

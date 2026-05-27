@@ -1,8 +1,11 @@
-import numpy as np
-import biotite.structure as struc
-import pytest
 import os
-from synth_saxs import get_form_factor, calculate_saxs_profile, calculate_radius_of_gyration
+
+import biotite.structure as struc
+import numpy as np
+import pytest
+
+from synth_saxs import calculate_radius_of_gyration, calculate_saxs_profile, get_form_factor
+
 
 class TestSAXSRigor:
     """Scientific rigor tests for SAXS simulation based on peer-reviewed standards."""
@@ -23,6 +26,7 @@ class TestSAXSRigor:
             pytest.skip("1UBQ.pdb test data not found.")
 
         import biotite.structure.io.pdb as pdb_io
+
         pdb_file = pdb_io.PDBFile.read(pdb_path)
         structure = pdb_file.get_structure(model=1)
         structure = structure[(structure.chain_id == "A") & (~structure.hetero)]
@@ -49,7 +53,7 @@ class TestSAXSRigor:
         np.random.seed(42)
         r = np.random.uniform(0, 10, n_atoms)
         theta = np.random.uniform(0, np.pi, n_atoms)
-        phi = np.random.uniform(0, 2*np.pi, n_atoms)
+        phi = np.random.uniform(0, 2 * np.pi, n_atoms)
         struct_folded.coord[:, 0] = r * np.sin(theta) * np.cos(phi)
         struct_folded.coord[:, 1] = r * np.sin(theta) * np.sin(phi)
         struct_folded.coord[:, 2] = r * np.cos(theta)
@@ -61,8 +65,12 @@ class TestSAXSRigor:
         struct_disordered.element = ["C", "C"]
 
         q = np.linspace(0.01, 0.5, 50)
-        _, i_folded = calculate_saxs_profile(struct_folded, q_min=0.01, q_max=0.5, n_points=50, include_solvent=False)
-        _, i_disordered = calculate_saxs_profile(struct_disordered, q_min=0.01, q_max=0.5, n_points=50, include_solvent=False)
+        _, i_folded = calculate_saxs_profile(
+            struct_folded, q_min=0.01, q_max=0.5, n_points=50, include_solvent=False
+        )
+        _, i_disordered = calculate_saxs_profile(
+            struct_disordered, q_min=0.01, q_max=0.5, n_points=50, include_solvent=False
+        )
 
         k_folded = (q**2) * i_folded
         k_disordered = (q**2) * i_disordered

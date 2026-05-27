@@ -106,7 +106,7 @@ def test_export_saxs(tmp_path: Any) -> None:
 def test_saxs_visualization(tmp_path: Any) -> None:
     """Verify that SAXS plots can be generated."""
     try:
-        import matplotlib.pyplot as plt
+        import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
 
@@ -127,19 +127,24 @@ def test_calculate_saxs_profile_stack_flattening():
     stack = struc.AtomArrayStack(1, 1)
     stack.coord = np.zeros((1, 1, 3))
     stack.element = ["C"]
-    
+
     q, intensity = calculate_saxs_profile(cast(Any, stack), n_points=5)
     assert len(intensity) == 5
     assert intensity[0] > 0
 
+
 def test_saxs_simulator_empty_list_fallback():
     """Verify fallback when an ensemble loop produces no intensities."""
+
     # This covers line 257 in engine.py
     class EmptyStack:
-        def stack_depth(self): return 1
-        def __getitem__(self, i): return None # Forces loop to finish without appends if logic allows, 
-                                             # but here we just need intensities to be empty.
-    
-    # Simpler: just mock calculate_saxs_profile to return nothing? 
+        def stack_depth(self):
+            return 1
+
+        def __getitem__(self, i):
+            return None  # Forces loop to finish without appends if logic allows,
+            # but here we just need intensities to be empty.
+
+    # Simpler: just mock calculate_saxs_profile to return nothing?
     # No, the code is simple enough that 100% coverage is just about hitting the lines.
     pass
