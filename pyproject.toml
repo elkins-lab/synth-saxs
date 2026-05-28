@@ -30,7 +30,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "numpy>=1.26.4,<2.0.0",
+    "numpy>=1.26.4",
     "biotite>=0.35.0",
     "scipy>=1.7.0",
 ]
