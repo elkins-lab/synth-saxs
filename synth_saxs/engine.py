@@ -377,4 +377,4 @@ def add_noise(intensity: np.ndarray, noise_level: float = 0.02) -> np.ndarray:
         np.ndarray: Noisy intensity values (minimum clamped to 1e-10).
     """
     noise = np.random.normal(0, noise_level * intensity, size=intensity.shape)
-    return np.maximum(1e-10, intensity + noise)
+    return cast(np.ndarray, np.maximum(1e-10, intensity + noise))
