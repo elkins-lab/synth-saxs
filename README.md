@@ -31,21 +31,73 @@ Extracted from the [synth-pdb](https://github.com/elkins/synth-pdb) ecosystem, i
 
 ## Installation
 ```bash
+# Basic installation
 pip install synth-saxs
+
+# Installation with visualization support
+pip install "synth-saxs[viz]"
 ```
 
+## Command-Line Interface (CLI)
+
+`synth-saxs` provides a CLI for rapid simulation and plotting:
+
+```bash
+# Basic simulation
+synth-saxs protein.pdb --output profile.dat
+
+# Plotting with Kratky analysis
+synth-saxs protein.pdb --plot report.png --plot-type kratky
+
+# Advanced modeling (Hydration Shell + P(r) distribution)
+synth-saxs protein.pdb --shell-density 0.03 --p-dist pr.png --p-dist-dat pr.dat
+```
+
+### CLI Arguments
+- `input`: Path to PDB/mmCIF file.
+- `--output`: Save $I(q)$ data to a `.dat` file.
+- `--plot`: Path to save a SAXS report image.
+- `--shell-density`: Excess hydration shell density (default: 0.0).
+- `--p-dist`: Save a plot of the $P(r)$ distribution.
+- `--p-dist-dat`: Save raw $P(r)$ data to a `.dat` file.
+
 ## Quick Start
+
+### 1. Single Structure Simulation
 ```python
 import biotite.structure.io.pdb as pdb_io
-from synth_saxs import calculate_saxs_profile
+from synth_saxs import calculate_saxs_profile, add_noise
 
 # Load a structure
 struct = pdb_io.PDBFile.read("protein.pdb").get_structure(model=1)
 
-# Calculate I(q)
+# Calculate I(q) and add realistic noise
 q, I = calculate_saxs_profile(struct)
+I_noisy = add_noise(I, noise_level=0.02)
+```
 
-# Plotting
+### 2. Ensemble Averaging
+The `SaxsSimulator` can handle both Biotite stacks and standard Python lists of structures.
+```python
+from synth_saxs import SaxsSimulator
+
+# List of different conformation models
+models = [model1, model2, model3]
+
+sim = SaxsSimulator(q_max=0.3)
+avg_intensity = sim.simulate(models)
+```
+
+### 3. Pair Distance Distribution P(r)
+```python
+from synth_saxs import calculate_p_dist, plot_p_dist
+
+r, pr = calculate_p_dist(struct)
+plot_p_dist(r, pr, output_path="p_dist.png")
+```
+
+### 4. Visualization
+```python
 from synth_saxs import plot_saxs_results
 plot_saxs_results(q, I, plot_type="all", output_path="saxs_report.png")
 ```
@@ -85,7 +137,7 @@ If you use synth-saxs in your research, please cite:
 @software{synth_saxs,
   author  = {Elkins, George},
   title   = {synth-saxs: SAXS profile simulation from protein coordinates},
-  year    = {2024},
+  year    = {2026},
   url     = {https://github.com/elkins/synth-saxs},
   version = {0.1.0}
 }

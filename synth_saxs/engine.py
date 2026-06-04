@@ -172,6 +172,7 @@ def calculate_saxs_profile(
     n_points: int = 51,
     include_solvent: bool = True,
     solvent_density: float = 0.334,  # e/A^3 (Water)
+    hydration_shell_density: float = 0.0,  # Excess density (e/A^3), typically 0.02-0.05
 ) -> tuple[np.ndarray, np.ndarray]:
     """Calculate the SAXS profile I(q) for a protein structure.
 
@@ -183,15 +184,20 @@ def calculate_saxs_profile(
         q_max: Maximum q value (default 0.5).
         n_points: Number of q points.
         include_solvent: If True, subtracts displaced solvent volume.
-        solvent_density: Electron density of the solvent.
+        solvent_density: Electron density of the bulk solvent.
+        hydration_shell_density: Excess electron density of the hydration shell.
 
     Returns:
         Tuple of (q_values, intensity_values).
     """
     n_atoms = structure.array_length()
-    logger.info(f"Calculating SAXS profile for {n_atoms} atoms...")
-
     q = np.linspace(q_min, q_max, n_points)
+
+    if n_atoms == 0:
+        logger.warning("Attempted to calculate SAXS profile for an empty structure.")
+        return q, np.zeros(n_points)
+
+    logger.info(f"Calculating SAXS profile for {n_atoms} atoms...")
 
     # 1. Precompute inter-atomic distances (N x N matrix)
     coords = structure.coord
@@ -213,7 +219,6 @@ def calculate_saxs_profile(
 
         if include_solvent:
             # Solvent displacement: f_eff = f_vac - rho_sol * V * exp(-q^2 * R^2 / 10)
-            # R is the effective atomic radius: R = (3V / 4pi)^(1/3)
             #
             # SCIENTIFIC NOTE - Monotonicity and Decay:
             # ----------------------------------------
@@ -223,9 +228,21 @@ def calculate_saxs_profile(
             # atomic volumes are small. We use K=10.0 for improved numerical
             # stability across all structure sizes, ensuring the protein's
             # interference always dominates the solvent decay at low q.
+            #
+            # Hydration Shell:
+            # ----------------
+            # We add a term representing the higher density of the bound water layer.
+            # Following CRYSOL-like approaches, this is modeled as an additional
+            # contrast term scaled by the atomic volume.
+            # f_eff = f_vac - (rho_sol - rho_shell_excess) * V * exp(...)
+
             v = FORM_FACTOR_COEFFS.get(elem.upper(), FORM_FACTOR_COEFFS["C"])["volume"]
             decay_rate = ((3 * v) / (4 * np.pi)) ** (2 / 3) / 10.0
-            f_sol = solvent_density * v * np.exp(-(q**2) * decay_rate)
+
+            # The shell density is added to the bulk density for the displaced volume
+            # in the immediate vicinity of the atom.
+            effective_density = solvent_density - hydration_shell_density
+            f_sol = effective_density * v * np.exp(-(q**2) * decay_rate)
             f_atom = f_atom - f_sol
 
         f_atoms_array[mask] = f_atom
@@ -269,14 +286,37 @@ class SaxsSimulator:
         q_max: float = 0.5,
         n_points: int = 51,
         include_solvent: bool = True,
+        hydration_shell_density: float = 0.0,
     ):
         self.q_min = q_min
         self.q_max = q_max
         self.n_points = n_points
         self.include_solvent = include_solvent
+        self.hydration_shell_density = hydration_shell_density
 
-    def simulate(self, structure: struc.AtomArray | struc.AtomArrayStack) -> np.ndarray:
+    def simulate(
+        self, structure: struc.AtomArray | struc.AtomArrayStack | list[struc.AtomArray]
+    ) -> np.ndarray:
         """Computes the averaged SAXS profile for a structure or ensemble."""
+        # Handle lists of AtomArrays
+        if isinstance(structure, list):
+            if not structure:
+                logger.warning("Attempted to simulate SAXS on an empty list.")
+                return np.zeros(self.n_points)
+
+            all_intensities = []
+            for item in structure:
+                _, intensity = calculate_saxs_profile(
+                    item,
+                    q_min=self.q_min,
+                    q_max=self.q_max,
+                    n_points=self.n_points,
+                    include_solvent=self.include_solvent,
+                    hydration_shell_density=self.hydration_shell_density,
+                )
+                all_intensities.append(intensity)
+            return cast(np.ndarray, np.mean(all_intensities, axis=0))
+
         if hasattr(structure, "stack_depth") and structure.stack_depth() > 0:
             # For ensembles, average the intensities
             all_intensities = []
@@ -287,6 +327,7 @@ class SaxsSimulator:
                     q_max=self.q_max,
                     n_points=self.n_points,
                     include_solvent=self.include_solvent,
+                    hydration_shell_density=self.hydration_shell_density,
                 )
                 all_intensities.append(intensity)
 
@@ -303,6 +344,7 @@ class SaxsSimulator:
             q_max=self.q_max,
             n_points=self.n_points,
             include_solvent=self.include_solvent,
+            hydration_shell_density=self.hydration_shell_density,
         )
         return intensity
 
@@ -340,6 +382,10 @@ def calculate_p_dist(
         coords = coords[0]
 
     n_atoms = len(coords)
+    if n_atoms < 2:
+        logger.warning("P(r) requires at least 2 atoms. Returning zeros.")
+        return np.linspace(0, r_max or 10.0, bins), np.zeros(bins)
+
     dist = cdist(coords, coords)
     triu_i, triu_j = np.triu_indices(n_atoms, k=1)
     r_ij = dist[triu_i, triu_j]

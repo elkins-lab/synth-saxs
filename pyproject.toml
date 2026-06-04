@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "synth-saxs"
-version = "0.1.1"
+version = "0.1.2"
 description = "Education-focused SAXS profile simulation from protein coordinates"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -19,6 +19,9 @@ keywords = [
     "biophysics",
     "simulation",
 ]
+
+[project.scripts]
+synth-saxs = "synth_saxs.cli:main"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",

@@ -131,20 +131,3 @@ def test_calculate_saxs_profile_stack_flattening():
     q, intensity = calculate_saxs_profile(cast(Any, stack), n_points=5)
     assert len(intensity) == 5
     assert intensity[0] > 0
-
-
-def test_saxs_simulator_empty_list_fallback():
-    """Verify fallback when an ensemble loop produces no intensities."""
-
-    # This covers line 257 in engine.py
-    class EmptyStack:
-        def stack_depth(self):
-            return 1
-
-        def __getitem__(self, i):
-            return None  # Forces loop to finish without appends if logic allows,
-            # but here we just need intensities to be empty.
-
-    # Simpler: just mock calculate_saxs_profile to return nothing?
-    # No, the code is simple enough that 100% coverage is just about hitting the lines.
-    pass
