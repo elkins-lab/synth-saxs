@@ -106,6 +106,8 @@ def test_export_saxs(tmp_path: Any) -> None:
 def test_saxs_visualization(tmp_path: Any) -> None:
     """Verify that SAXS plots can be generated."""
     try:
+        import matplotlib
+        matplotlib.use("Agg")
         import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
         pytest.skip("matplotlib not installed")
