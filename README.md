@@ -1,6 +1,6 @@
 # synth-saxs
 
-[![codecov](https://codecov.io/gh/elkins/synth-saxs/graph/badge.svg)](https://codecov.io/gh/elkins/synth-saxs)
+[![codecov](https://codecov.io/gh/elkins/synth-saxs/branch/main/graph/badge.svg)](https://codecov.io/gh/elkins/synth-saxs)
 [![PyPI version](https://img.shields.io/pypi/v/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![Python](https://img.shields.io/pypi/pyversions/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
