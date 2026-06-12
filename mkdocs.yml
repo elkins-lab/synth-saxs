@@ -1,5 +1,5 @@
 site_name: synth-saxs
-site_url: https://elkins.github.io/synth-saxs
+site_url: https://elkins-lab.github.io/synth-saxs
 repo_url: https://github.com/elkins/synth-saxs
 repo_name: elkins/synth-saxs
 site_description: Lightweight SAXS profile simulation from protein coordinates
