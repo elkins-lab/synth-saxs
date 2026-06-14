@@ -2,6 +2,8 @@
 Small-Angle X-ray Scattering (SAXS) Simulation for Structural Biology.
 """
 
+__version__ = "0.1.3"
+
 from .engine import (
     SaxsSimulator,
     add_noise,

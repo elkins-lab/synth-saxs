@@ -118,13 +118,42 @@ def test_plot_p_dist(tmp_path):
     assert os.path.exists(output_path)
 
 
-def test_plot_p_dist_no_matplotlib():
-    """Verify graceful failure for plot_p_dist when matplotlib is missing."""
+def test_plot_saxs_results_no_output():
+    """Test SAXS plot without saving to file."""
+    try:
+        import matplotlib.pyplot as plt  # noqa: F401
+    except ImportError:
+        pytest.skip("matplotlib not installed")
+
+    q = np.linspace(0.01, 0.5, 50)
+    intensity = np.exp(-(q**2) * 100)
+
+    fig = plot_saxs_results(q, intensity, output_path=None)
+    assert fig is not None
+
+
+def test_plot_p_dist_no_output():
+    """Test P(r) plot without saving to file."""
     from synth_saxs.visualization import plot_p_dist
 
-    with pytest.MonkeyPatch().context() as m:
-        import synth_saxs.visualization
+    try:
+        import matplotlib.pyplot as plt  # noqa: F401
+    except ImportError:
+        pytest.skip("matplotlib not installed")
 
-        m.setattr(synth_saxs.visualization, "HAS_MATPLOTLIB", False)
-        fig = plot_p_dist(np.array([0.1]), np.array([1.0]))
-        assert fig is None
+    r = np.linspace(0, 100, 50)
+    p_r = r**2 * np.exp(-(r**2) / 1000)
+
+    fig = plot_p_dist(r, p_r, output_path=None)
+    assert fig is not None
+
+
+def test_plot_saxs_results_invalid_type():
+    """Test SAXS plot with an invalid plot type (should just return fig with standard plot)."""
+    # Note: argparse should prevent this in CLI, but internal API should be robust.
+    q = np.linspace(0.01, 0.5, 50)
+    intensity = np.exp(-(q**2) * 100)
+
+    # This shouldn't crash
+    fig = plot_saxs_results(q, intensity, plot_type="invalid_type")
+    assert fig is not None

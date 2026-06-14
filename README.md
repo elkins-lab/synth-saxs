@@ -35,6 +35,7 @@ Extracted from the [synth-pdb](https://github.com/elkins/synth-pdb) ecosystem, i
 Experience **synth-saxs** directly in your browser:
 
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-saxs/blob/main/examples/interactive_tutorials/saxs_profile_generation.ipynb) **SAXS Profile Generation** — Learn how to compute I(q) from coordinates and perform Kratky analysis.
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-saxs/blob/main/examples/interactive_tutorials/hydration_shell_analysis.ipynb) **Hydration Shell Analysis** — Interactive visualization of solvent contrast and its effect on perceived protein size.
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-saxs/blob/main/examples/interactive_tutorials/end_to_end_validation.ipynb) **End-to-End Validation** — Compare synthetic SAXS data against experimental benchmarks.
 
 ## Installation

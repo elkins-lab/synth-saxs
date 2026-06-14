@@ -140,7 +140,7 @@ def get_form_factor(element: str, q: np.ndarray) -> np.ndarray:
     """
     element = element.upper()
     if element not in FORM_FACTOR_COEFFS:
-        # Fallback to Carbon if element unknown
+        logger.warning(f"Unknown element '{element}'. Falling back to Carbon ('C') form factors.")
         element = "C"
 
     coeffs = FORM_FACTOR_COEFFS[element]

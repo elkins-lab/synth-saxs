@@ -67,13 +67,16 @@ def test_saxs_simulator_single_structure() -> None:
     assert np.all(intensity > 0)
 
 
-def test_get_form_factor_fallback() -> None:
-    """Verify that get_form_factor falls back to Carbon for unknown elements."""
+def test_get_form_factor_fallback(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify that get_form_factor falls back to Carbon for unknown elements and logs a warning."""
     from synth_saxs import get_form_factor
 
     q = np.array([0.1])
     f_carbon = get_form_factor("C", q)
-    f_unknown = get_form_factor("UnknownElement", q)
+
+    with caplog.at_level("WARNING"):
+        f_unknown = get_form_factor("UnknownElement", q)
+        assert "Unknown element 'UNKNOWNELEMENT'. Falling back to Carbon ('C')" in caplog.text
 
     assert np.allclose(f_carbon, f_unknown)
 
@@ -107,6 +110,7 @@ def test_saxs_visualization(tmp_path: Any) -> None:
     """Verify that SAXS plots can be generated."""
     try:
         import matplotlib
+
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt  # noqa: F401
     except ImportError:
