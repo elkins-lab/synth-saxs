@@ -61,8 +61,6 @@ def test_cli_plotting(tmp_path):
         str(plot_path),
         "--p-dist",
         str(pr_path),
-        "--p-dist-dat",
-        str(pr_dat),
     ]
 
     with patch("sys.argv", test_args):
@@ -70,6 +68,17 @@ def test_cli_plotting(tmp_path):
 
     assert os.path.exists(plot_path)
     assert os.path.exists(pr_path)
+
+    # Test p-dist-dat independently
+    test_args_dat = [
+        "synth-saxs",
+        str(pdb_path),
+        "--p-dist-dat",
+        str(pr_dat),
+    ]
+    with patch("sys.argv", test_args_dat):
+        main()
+
     assert os.path.exists(pr_dat)
 
 

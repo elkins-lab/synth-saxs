@@ -157,3 +157,37 @@ def test_plot_saxs_results_invalid_type():
     # This shouldn't crash
     fig = plot_saxs_results(q, intensity, plot_type="invalid_type")
     assert fig is not None
+
+
+def test_guinier_positive_slope():
+    """Verify Guinier fit handles non-physical positive slope (imaginary Rg)."""
+    try:
+        import matplotlib.pyplot as plt  # noqa: F401
+    except ImportError:
+        pytest.skip("matplotlib not installed")
+
+    q = np.linspace(0.01, 0.1, 10)
+    # Intensity that INCREASES with q (non-physical for Guinier)
+    intensity = np.exp(q**2 * 10)
+
+    fig = plot_saxs_results(q, intensity, plot_type="guinier")
+    assert fig is not None
+    # Code should handle this by taking max(0, -3*slope) -> Rg=0
+    # We just ensure it doesn't crash.
+
+
+def test_matplotlib_import_failure():
+    """Attempt to cover the ImportError block in visualization.py using reload."""
+    import sys
+    from importlib import reload
+    from unittest.mock import patch
+
+    # Mock matplotlib to be missing during reload
+    with patch.dict(sys.modules, {"matplotlib": None, "matplotlib.pyplot": None}):
+        import synth_saxs.visualization
+
+        reload(synth_saxs.visualization)
+        assert synth_saxs.visualization.HAS_MATPLOTLIB is False
+
+    # Restore state for other tests
+    reload(synth_saxs.visualization)
