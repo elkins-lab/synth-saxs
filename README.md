@@ -1,6 +1,7 @@
 # synth-saxs
 
 [![codecov](https://codecov.io/gh/elkins/synth-saxs/branch/main/graph/badge.svg)](https://codecov.io/gh/elkins/synth-saxs)
+[![OpenSSF Best Practices](https://bestpractices.dev/projects/XXXX/badge)](https://bestpractices.dev/projects/XXXX)
 [![PyPI version](https://img.shields.io/pypi/v/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![Python](https://img.shields.io/pypi/pyversions/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -138,6 +139,13 @@ This library is part of the **synth-pdb ecosystem** for synthetic biophysics dat
 ## Contributing
 
 Contributions are welcome! Please open an issue or pull request on [GitHub](https://github.com/elkins/synth-saxs). The project uses `ruff` for linting/formatting and `mypy` for type checking — run `pre-commit run --all-files` before submitting.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
+
+## Community & Security
+
+-   **Code of Conduct**: We expect all participants to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+-   **Security**: Please report security vulnerabilities privately according to our [Security Policy](SECURITY.md).
 
 ## License
 
