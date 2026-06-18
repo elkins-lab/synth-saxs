@@ -2,7 +2,12 @@
 Small-Angle X-ray Scattering (SAXS) Simulation for Structural Biology.
 """
 
-__version__ = "0.1.4"
+import importlib.metadata
+
+try:
+    __version__ = importlib.metadata.version("synth-saxs")
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "unknown"
 
 from .engine import (
     SaxsSimulator,
