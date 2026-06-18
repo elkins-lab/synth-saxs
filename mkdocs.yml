@@ -17,6 +17,7 @@ nav:
   - API Reference: api.md
   - Science: science.md
   - Scientific Validation: validation.md
+  - Security Policy: SECURITY.md
 
 plugins:
   - search
