@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-06-18
+
+### Added
+- Added `preprocess_structure` utility with `keep_nucleic_acids=True` support to explicitly preserve DNA/RNA chains during SAXS buffer subtraction.
+- Added interactive tutorial on detecting allosteric hinge motions using HIV-1 Reverse Transcriptase as a model system.
+- Added interactive tutorial bridging `synth-pdb` and `synth-saxs`.
+
+### Fixed
+- Fixed Jupyter Notebook `ModuleNotFoundError` issues in Colab by isolating package installations into separate execution cells.
+- Fixed codecov badge path mapping by adding `codecov.yml` configuration.
+
 ## [0.1.4] - 2026-06-18
 
 ### Added
