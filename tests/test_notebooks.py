@@ -5,7 +5,7 @@ NOTEBOOK_DIR = Path("examples/interactive_tutorials")
 
 
 def _notebook_source(path: Path) -> str:
-    data = json.loads(path.read_text())
+    data = json.loads(path.read_text(encoding="utf-8"))
     return "\n".join(
         "".join(cell.get("source", []))
         for cell in data["cells"]
