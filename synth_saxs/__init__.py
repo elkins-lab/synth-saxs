@@ -12,6 +12,7 @@ from .engine import (
     calculate_saxs_profile,
     export_saxs_profile,
     get_form_factor,
+    preprocess_structure,
 )
 from .visualization import plot_p_dist, plot_saxs_results
 
@@ -25,4 +26,5 @@ __all__ = [
     "calculate_p_dist",
     "add_noise",
     "plot_p_dist",
+    "preprocess_structure",
 ]

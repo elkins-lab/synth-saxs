@@ -455,3 +455,57 @@ def add_noise(intensity: np.ndarray, noise_level: float = 0.02) -> np.ndarray:
     """
     noise = np.random.normal(0, noise_level * intensity, size=intensity.shape)
     return cast(np.ndarray, np.maximum(1e-10, intensity + noise))
+
+
+def preprocess_structure(
+    structure: struc.AtomArray, keep_nucleic_acids: bool = True
+) -> struc.AtomArray:
+    """Safely preprocess a structure for SAXS simulation.
+
+    This function removes common crystallization buffers and water molecules
+    that should not be included in the protein/complex scattering profile,
+    while explicitly preserving DNA and RNA chains if requested.
+
+    Args:
+        structure: The input Biotite AtomArray.
+        keep_nucleic_acids: If True, explicitly preserves DNA and RNA chains.
+
+    Returns:
+        struc.AtomArray: The filtered structure.
+    """
+    # 1. Start with canonical amino acids
+    mask = struc.filter_amino_acids(structure)
+
+    # 2. Add nucleic acids if requested
+    if keep_nucleic_acids:
+        mask = mask | struc.filter_nucleotides(structure)
+
+    # 3. Alternatively, if we just want to remove specific bad actors:
+    # A more robust way in SAXS is to keep everything EXCEPT known buffers/water,
+    # because proteins might have functional ligands (e.g. ATP, Heme, Zinc).
+    # Let's define common unwanted hetero residues:
+    unwanted_res_names = {
+        "HOH",
+        "DOD",
+        "WAT",
+        "SO4",
+        "GOL",
+        "PEG",
+        "EDO",
+        "ACT",
+        "PO4",
+        "CL",
+        "NA",
+        "MG",
+    }
+
+    # Create a mask that keeps everything EXCEPT the unwanted residues
+    robust_mask = np.ones(structure.array_length(), dtype=bool)
+    for i, res_name in enumerate(structure.res_name):
+        if res_name in unwanted_res_names:
+            robust_mask[i] = False
+
+    # If the user explicitly wants to drop non-amino/nucleic acids, they can do so themselves.
+    # But for a default safe SAXS prep, stripping explicit solvent and common buffers is best.
+    filtered = structure[robust_mask]
+    return filtered

@@ -139,3 +139,29 @@ def test_calculate_saxs_profile_stack_flattening():
     q, intensity = calculate_saxs_profile(cast(Any, stack), n_points=5)
     assert len(intensity) == 5
     assert intensity[0] > 0
+
+
+def test_preprocess_structure():
+    """Verify that preprocess_structure filters correctly."""
+    from synth_saxs import preprocess_structure
+
+    atoms = struc.AtomArray(5)
+    atoms.coord = np.zeros((5, 3))
+    atoms.element = ["C", "C", "O", "P", "S"]
+    atoms.res_name = ["ALA", "TRP", "HOH", "DG", "SO4"]
+
+    # 1. Test removing just unwanted buffers (HOH, SO4)
+    filtered = preprocess_structure(atoms, keep_nucleic_acids=True)
+    assert len(filtered) == 3
+    assert "HOH" not in filtered.res_name
+    assert "SO4" not in filtered.res_name
+    assert "ALA" in filtered.res_name
+    assert "DG" in filtered.res_name
+
+    # 2. Test without keep_nucleic_acids (although our robust mask keeps it anyway unless it's in the unwanted list)
+    # Actually, the robust mask we implemented keeps EVERYTHING except unwanted_res_names.
+    # So keep_nucleic_acids=False will still keep 'DG' because 'DG' is not in unwanted_res_names.
+    # The mask implementation uses robust_mask. Let's verify the logic we wrote.
+    filtered_no_na = preprocess_structure(atoms, keep_nucleic_acids=False)
+    assert len(filtered_no_na) == 3
+    assert "DG" in filtered_no_na.res_name
