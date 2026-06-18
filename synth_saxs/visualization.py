@@ -9,6 +9,7 @@ from typing import Any
 import numpy as np
 
 logger = logging.getLogger(__name__)
+PLOT_TYPES = {"standard", "kratky", "guinier", "porod", "all"}
 
 # Optional Matplotlib Dependency
 try:
@@ -54,6 +55,9 @@ def plot_saxs_results(
         logger.warning("Matplotlib not installed. Skipping SAXS visualization.")
         print("\n[INFO]  To enable SAXS visualization, install matplotlib: pip install matplotlib")
         return None
+    if plot_type not in PLOT_TYPES:
+        accepted = ", ".join(sorted(PLOT_TYPES))
+        raise ValueError(f"plot_type must be one of: {accepted}.")
 
     if plot_type == "all":
         fig, axes = plt.subplots(2, 2, figsize=(12, 10))

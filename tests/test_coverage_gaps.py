@@ -17,6 +17,34 @@ def test_calculate_saxs_profile_empty():
     assert np.all(intensity == 0)
 
 
+def test_calculate_saxs_profile_rejects_invalid_q_grid():
+    """Verify invalid q-grid inputs fail with actionable errors."""
+    atoms = struc.AtomArray(1)
+    atoms.coord = np.zeros((1, 3))
+    atoms.element = ["C"]
+
+    with pytest.raises(ValueError, match="n_points"):
+        calculate_saxs_profile(atoms, n_points=0)
+    with pytest.raises(ValueError, match="n_points"):
+        calculate_saxs_profile(atoms, n_points=1.5)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="numeric"):
+        calculate_saxs_profile(atoms, q_min="low")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="finite"):
+        calculate_saxs_profile(atoms, q_min=np.nan)
+    with pytest.raises(ValueError, match="q_max"):
+        calculate_saxs_profile(atoms, q_min=0.5, q_max=0.1)
+
+
+def test_calculate_saxs_profile_rejects_nonfinite_coordinates():
+    """Verify SAXS calculation rejects NaN/inf coordinates before distance calculation."""
+    atoms = struc.AtomArray(1)
+    atoms.coord = np.array([[np.nan, 0.0, 0.0]])
+    atoms.element = ["C"]
+
+    with pytest.raises(ValueError, match="coordinates must be finite"):
+        calculate_saxs_profile(atoms)
+
+
 def test_calculate_p_dist_too_few_atoms():
     """Verify that P(r) handles < 2 atoms without crashing."""
     # 0 atoms
@@ -31,6 +59,22 @@ def test_calculate_p_dist_too_few_atoms():
     atoms1.element = ["C"]
     r1, p1 = calculate_p_dist(atoms1, bins=5)
     assert np.all(p1 == 0)
+
+
+def test_calculate_p_dist_rejects_invalid_inputs():
+    """Verify invalid P(r) inputs fail before histogram calculation."""
+    atoms = struc.AtomArray(2)
+    atoms.coord = np.array([[0, 0, 0], [10, 0, 0]])
+    atoms.element = ["C", "C"]
+
+    with pytest.raises(ValueError, match="bins"):
+        calculate_p_dist(atoms, bins=0)
+    with pytest.raises(ValueError, match="bins"):
+        calculate_p_dist(atoms, bins=2.5)  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="numeric"):
+        calculate_p_dist(atoms, r_max="far")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="r_max"):
+        calculate_p_dist(atoms, r_max=0)
 
 
 def test_calculate_p_dist_custom_rmax():

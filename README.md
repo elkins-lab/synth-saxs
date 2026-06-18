@@ -45,6 +45,9 @@ pip install synth-saxs
 
 # Installation with visualization support
 pip install "synth-saxs[viz]"
+
+# Documentation tooling for contributors
+pip install "synth-saxs[docs]"
 ```
 
 ## Command-Line Interface (CLI)

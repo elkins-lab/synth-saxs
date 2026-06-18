@@ -40,7 +40,7 @@ The repository is configured to automatically publish to PyPI when a **GitHub Re
 `synth-saxs` is also published on Bioconda. The recipe is maintained in a fork of `bioconda-recipes`.
 
 ### 1. Update the Recipe
-The local copy of the recipe is in `bioconda_recipe/`. When a new version is released on PyPI:
+The local copy of the recipe is tracked in `bioconda_recipe/`. When a new version is released on PyPI:
 1.  Update `version` and `sha256` in `bioconda_recipe/meta.yaml`.
 2.  Copy the recipe to your `bioconda-recipes` fork:
     ```bash

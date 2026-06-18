@@ -149,14 +149,12 @@ def test_plot_p_dist_no_output():
 
 
 def test_plot_saxs_results_invalid_type():
-    """Test SAXS plot with an invalid plot type (should just return fig with standard plot)."""
-    # Note: argparse should prevent this in CLI, but internal API should be robust.
+    """Test SAXS plot with an invalid plot type raises a useful API error."""
     q = np.linspace(0.01, 0.5, 50)
     intensity = np.exp(-(q**2) * 100)
 
-    # This shouldn't crash
-    fig = plot_saxs_results(q, intensity, plot_type="invalid_type")
-    assert fig is not None
+    with pytest.raises(ValueError, match="plot_type must be one of"):
+        plot_saxs_results(q, intensity, plot_type="invalid_type")
 
 
 def test_guinier_positive_slope():
