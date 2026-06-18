@@ -117,6 +117,8 @@ plot_saxs_results(q, I, plot_type="all", output_path="saxs_report.png")
 ## Scientific Rationale
 The engine is designed for numerical stability and educational clarity. It correctly handles the delicate balance between atomic contrast and solvent displacement decay to ensure monotonic scattering curves in the Guinier regime.
 
+For detailed information on how the engine was validated against peer-reviewed experimental data, see the [Scientific Validation Report](docs/validation.md).
+
 ## References
 - Waasmaier, D. & Kirfel, A. (1995). Acta Cryst. A51, 416-431.
 - Pavlov, M.Y. & Svergun, D.I. (1997). J. Appl. Cryst. 30, 712-717.
