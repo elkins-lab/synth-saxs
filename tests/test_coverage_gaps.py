@@ -156,6 +156,39 @@ def test_visualization_missing_rg_guinier():
     assert fig is not None
 
 
+def test_calculate_saxs_profile_rejects_invalid_coord_shape():
+    """Verify SAXS calculation rejects non-(N,3) coordinates using a mock."""
+    from unittest.mock import MagicMock
+
+    mock_structure = MagicMock()
+    mock_structure.coord = np.zeros((1, 2))  # Wrong shape
+    mock_structure.element = np.array(["C"])
+
+    with pytest.raises(ValueError, match=r"shape \(n_atoms, 3\)"):
+        calculate_saxs_profile(mock_structure)
+
+
+def test_calculate_p_dist_rejects_invalid_coord_shape():
+    """Verify P(r) calculation rejects non-(N,3) coordinates using a mock."""
+    from unittest.mock import MagicMock
+
+    mock_structure = MagicMock()
+    mock_structure.coord = np.zeros((2, 4))  # Wrong shape
+
+    with pytest.raises(ValueError, match=r"shape \(n_atoms, 3\)"):
+        calculate_p_dist(mock_structure)
+
+
+def test_calculate_p_dist_rejects_nonfinite_coordinates():
+    """Verify P(r) calculation rejects NaN/inf coordinates."""
+    atoms = struc.AtomArray(2)
+    atoms.coord = np.array([[0, 0, 0], [np.nan, 0, 0]])
+    atoms.element = ["C", "C"]
+
+    with pytest.raises(ValueError, match="coordinates must be finite"):
+        calculate_p_dist(atoms)
+
+
 def test_plot_p_dist_no_matplotlib_manual():
     """Manually verify plot_p_dist when HAS_MATPLOTLIB is False (mocked)."""
     import synth_saxs.visualization
