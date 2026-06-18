@@ -46,7 +46,6 @@ from typing import Any, cast
 
 import biotite.structure as struc
 import numpy as np
-from scipy.spatial.distance import cdist
 
 logger = logging.getLogger(__name__)
 
@@ -222,8 +221,10 @@ def calculate_saxs_profile(
     if not np.all(np.isfinite(coords)):
         raise ValueError("structure coordinates must be finite.")
 
-    # Use scipy for efficient distance calculation
-    dist = cdist(coords, coords)
+    # Use scipy pdist for memory-efficient distance calculation (returns only upper triangle)
+    from scipy.spatial.distance import pdist
+
+    r_ij = pdist(coords)
 
     # 2. Vectorized form factor calculation
     elements = structure.element
@@ -268,9 +269,10 @@ def calculate_saxs_profile(
     intensity = np.zeros(n_points)
 
     # Pre-extract upper triangle indices for O(N^2/2) optimization
-    # This reduces memory and computation by exploiting symmetry
     triu_i, triu_j = np.triu_indices(n_atoms, k=1)
-    r_ij = dist[triu_i, triu_j]
+
+    # Process cross-terms in chunks to drastically reduce peak memory
+    chunk_size = 5_000_000
 
     for i in range(n_points):
         qi = q[i]
@@ -284,10 +286,14 @@ def calculate_saxs_profile(
             self_terms = np.sum(fi**2)
 
             # Cross-terms: 2 * sum_{i<j} f_i * f_j * sinc(q * r_ij)
-            # We use vectorization for performance
-            f_prod = fi[triu_i] * fi[triu_j]
-            sinc_qr = np.sinc((qi * r_ij) / np.pi)
-            cross_terms = 2.0 * np.sum(f_prod * sinc_qr)
+            cross_terms = 0.0
+
+            # Chunk the evaluation to prevent >10GB memory spikes on large complexes (e.g. HIV-1 RT)
+            for start in range(0, len(r_ij), chunk_size):
+                end = start + chunk_size
+                f_prod = fi[triu_i[start:end]] * fi[triu_j[start:end]]
+                sinc_qr = np.sinc((qi * r_ij[start:end]) / np.pi)
+                cross_terms += 2.0 * np.sum(f_prod * sinc_qr)
 
             intensity[i] = self_terms + cross_terms
 
@@ -417,9 +423,10 @@ def calculate_p_dist(
         logger.warning("P(r) requires at least 2 atoms. Returning zeros.")
         return np.linspace(0, r_max or 10.0, bins), np.zeros(bins)
 
-    dist = cdist(coords, coords)
+    from scipy.spatial.distance import pdist
+
+    r_ij = pdist(coords)
     triu_i, triu_j = np.triu_indices(n_atoms, k=1)
-    r_ij = dist[triu_i, triu_j]
 
     # Weight by scattering power at q=0: f_i(0) * f_j(0)
     elements = structure.element
