@@ -1,5 +1,5 @@
 {% set name = "synth-saxs" %}
-{% set version = "0.1.4" %}
+{% set version = "0.1.5" %}
 
 package:
   name: {{ name|lower }}
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name | replace("-", "_") }}-{{ version }}.tar.gz
-  sha256: 1edb79772057cf97a16b6ae6a801154fb7baf1b92e2780cec19f76aab076f526
+  sha256: 1f8a1e1a38bb311c74ddaab0b46625758b783533501fce6c0bd8fd96994075ae
 
 build:
   number: 0
