@@ -5,6 +5,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![Python](https://img.shields.io/pypi/pyversions/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/1243068226.svg)](https://doi.org/10.5281/zenodo.20752799)
 [![Tests](https://github.com/elkins-lab/synth-saxs/actions/workflows/test.yml/badge.svg)](https://github.com/elkins-lab/synth-saxs/actions/workflows/test.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://img.shields.io/badge/type%20checked-mypy-blue)](https://mypy-lang.org/)
