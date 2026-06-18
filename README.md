@@ -1,11 +1,11 @@
 # synth-saxs
 
-[![codecov](https://codecov.io/gh/elkins/synth-saxs/branch/main/graph/badge.svg)](https://codecov.io/gh/elkins/synth-saxs)
+[![codecov](https://codecov.io/gh/elkins-lab/synth-saxs/branch/main/graph/badge.svg)](https://codecov.io/gh/elkins-lab/synth-saxs)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13300/badge)](https://www.bestpractices.dev/projects/13300)
 [![PyPI version](https://img.shields.io/pypi/v/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![Python](https://img.shields.io/pypi/pyversions/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/elkins/synth-saxs/actions/workflows/test.yml/badge.svg)](https://github.com/elkins/synth-saxs/actions/workflows/test.yml)
+[![Tests](https://github.com/elkins-lab/synth-saxs/actions/workflows/test.yml/badge.svg)](https://github.com/elkins-lab/synth-saxs/actions/workflows/test.yml)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://img.shields.io/badge/type%20checked-mypy-blue)](https://mypy-lang.org/)
 
