@@ -1,7 +1,9 @@
 import argparse
 import logging
 import sys
+from typing import cast
 
+import biotite.structure as struc
 import biotite.structure.io as strucio
 import numpy as np
 
@@ -55,9 +57,11 @@ def main() -> None:
         # 1. Load Structure
         logger.info(f"Loading structure from {args.input}...")
         structure = strucio.load_structure(args.input)
-        if hasattr(structure, "stack_depth") and structure.stack_depth() > 1:
-            logger.info(f"Detected stack with {structure.stack_depth()} models. Using model 1.")
+        if isinstance(structure, struc.AtomArrayStack):
+            if structure.stack_depth() > 1:
+                logger.info(f"Detected stack with {structure.stack_depth()} models. Using model 1.")
             structure = structure[0]
+        structure = cast(struc.AtomArray, structure)
 
         # 2. Calculate SAXS Profile
         logger.info("Calculating SAXS profile...")

@@ -120,9 +120,7 @@ check_untyped_defs = true
 strict_equality = true
 exclude = ["build/", "dist/", "scratch/", "site/"]
 
-[[tool.mypy.overrides]]
-module = ["tests.*"]
-disallow_untyped_defs = false
+
 
 [[tool.mypy.overrides]]
 module = [

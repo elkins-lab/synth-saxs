@@ -345,7 +345,7 @@ class SaxsSimulator:
             all_intensities = []
             for i in range(structure.stack_depth()):
                 _, intensity = calculate_saxs_profile(
-                    structure[i],
+                    cast(struc.AtomArray, structure[i]),
                     q_min=self.q_min,
                     q_max=self.q_max,
                     n_points=self.n_points,
