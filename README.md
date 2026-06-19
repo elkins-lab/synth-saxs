@@ -41,6 +41,8 @@ Experience **synth-saxs** directly in your browser:
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins/synth-saxs/blob/main/examples/interactive_tutorials/end_to_end_validation.ipynb) **End-to-End Validation** — Compare synthetic SAXS data against experimental benchmarks.
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins-lab/synth-saxs/blob/main/examples/interactive_tutorials/synth_suite_bridge.ipynb) **Synth Suite Bridge** — Demonstrate how to seamlessly link `synth-pdb` structure generation with `synth-saxs`.
 - [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins-lab/synth-saxs/blob/main/examples/interactive_tutorials/hiv1_rt_hinge_motion.ipynb) **Allosteric Hinge Motions** — Use $P(r)$ distance distributions to detect conformational changes in HIV-1 RT.
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins-lab/synth-saxs/blob/main/examples/interactive_tutorials/interactive_sandbox.ipynb) **Interactive Sandbox** — Real-time SAXS profile manipulation.
+- [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/elkins-lab/synth-saxs/blob/main/examples/interactive_tutorials/idp_vs_folded.ipynb) **IDPs vs Folded Proteins** — Contrasting scattering profiles of rigid and disordered proteins.
 
 ## Installation
 ```bash
