@@ -19,6 +19,12 @@ from .engine import (
     get_form_factor,
     preprocess_structure,
 )
+from .fitting import (
+    calculate_chi_squared,
+    fit_profile,
+    interpolate_profile,
+    load_experimental_data,
+)
 from .visualization import plot_p_dist, plot_saxs_results
 
 __all__ = [
@@ -32,4 +38,8 @@ __all__ = [
     "add_noise",
     "plot_p_dist",
     "preprocess_structure",
+    "load_experimental_data",
+    "interpolate_profile",
+    "fit_profile",
+    "calculate_chi_squared",
 ]

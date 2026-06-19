@@ -13,6 +13,7 @@ from synth_saxs.engine import (
     calculate_saxs_profile,
     export_saxs_profile,
 )
+from synth_saxs.fitting import fit_profile, interpolate_profile, load_experimental_data
 from synth_saxs.visualization import plot_p_dist, plot_saxs_results
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -39,6 +40,7 @@ def main() -> None:
     parser.add_argument(
         "--no-solvent", action="store_false", dest="include_solvent", help="Disable solvent model."
     )
+    parser.add_argument("--fit", help="Path to experimental .dat file to fit against.")
     parser.add_argument("--plot", help="Output path for the SAXS plot (e.g. report.png).")
     parser.add_argument(
         "--plot-type",
@@ -74,15 +76,30 @@ def main() -> None:
             hydration_shell_density=args.shell_density,
         )
 
-        # 3. Export Data
+        # 3. Fitting
+        exp_data = None
+        if args.fit:
+            logger.info(f"Fitting to experimental data from {args.fit}...")
+            q_exp, i_exp, err_exp = load_experimental_data(args.fit)
+            i_calc_interp = interpolate_profile(q_exp, q, intensity)
+            c, k, chi_sq = fit_profile(i_exp, err_exp, i_calc_interp)
+            logger.info(f"Fit Results: c_scale = {c:.4e}, k_offset = {k:.4e}, chi^2 = {chi_sq:.4f}")
+            exp_data = (q_exp, i_exp, err_exp, c, k)
+
+        # 4. Export Data
         if args.output:
             export_saxs_profile(q, intensity, args.output)
 
-        # 4. Visualization
+        # 5. Visualization
         if args.plot:
             rg = calculate_radius_of_gyration(structure)
             plot_saxs_results(
-                q, intensity, plot_type=args.plot_type, output_path=args.plot, rg=float(rg)
+                q,
+                intensity,
+                plot_type=args.plot_type,
+                output_path=args.plot,
+                rg=float(rg),
+                exp_data=exp_data,
             )
 
         # 5. P(r) Calculation

@@ -27,6 +27,7 @@ def plot_saxs_results(
     output_path: str | None = None,
     plot_type: str = "standard",
     rg: float | None = None,
+    exp_data: tuple[np.ndarray, np.ndarray, np.ndarray, float, float] | None = None,
 ) -> Any:
     """Generate SAXS plots (Standard, Kratky, Guinier, or Porod).
 
@@ -47,6 +48,7 @@ def plot_saxs_results(
         output_path: If provided, saves plot to file.
         plot_type: 'standard', 'kratky', 'guinier', 'porod', or 'all'.
         rg: Optional Radius of Gyration (A) to overlay on Guinier plot.
+        exp_data: Optional tuple from fitting (q_exp, i_exp, err_exp, c_scale, k_offset).
 
     Returns:
         The matplotlib figure object, or None if matplotlib is missing.
@@ -61,20 +63,28 @@ def plot_saxs_results(
 
     if plot_type == "all":
         fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-        _draw_standard_plot(axes[0, 0], q, intensity, title)
+        _draw_standard_plot(axes[0, 0], q, intensity, title, exp_data)
         _draw_kratky_plot(axes[0, 1], q, intensity)
         _draw_guinier_plot(axes[1, 0], q, intensity, rg)
         _draw_porod_plot(axes[1, 1], q, intensity)
     else:
-        fig, ax = plt.subplots(figsize=(8, 5))
-        if plot_type == "standard":
-            _draw_standard_plot(ax, q, intensity, title)
-        elif plot_type == "kratky":
-            _draw_kratky_plot(ax, q, intensity, title)
-        elif plot_type == "guinier":
-            _draw_guinier_plot(ax, q, intensity, rg, title)
-        elif plot_type == "porod":
-            _draw_porod_plot(ax, q, intensity, title)
+        if plot_type == "standard" and exp_data is not None:
+            # Create a 2-row layout: main plot (top, larger), residuals (bottom, smaller)
+            fig = plt.figure(figsize=(8, 7))
+            gs = fig.add_gridspec(2, 1, height_ratios=[3, 1], hspace=0.05)
+            ax_main = fig.add_subplot(gs[0])
+            ax_res = fig.add_subplot(gs[1], sharex=ax_main)
+            _draw_standard_plot(ax_main, q, intensity, title, exp_data, ax_res)
+        else:
+            fig, ax = plt.subplots(figsize=(8, 5))
+            if plot_type == "standard":
+                _draw_standard_plot(ax, q, intensity, title)
+            elif plot_type == "kratky":
+                _draw_kratky_plot(ax, q, intensity, title)
+            elif plot_type == "guinier":
+                _draw_guinier_plot(ax, q, intensity, rg, title)
+            elif plot_type == "porod":
+                _draw_porod_plot(ax, q, intensity, title)
 
     plt.tight_layout()
 
@@ -116,10 +126,55 @@ def plot_p_dist(
     return fig
 
 
-def _draw_standard_plot(ax: Any, q: np.ndarray, intensity: np.ndarray, title: str = "") -> None:
-    """Log-linear I(q) vs q plot."""
-    ax.semilogy(q, intensity, "b-", linewidth=2, label="I(q)")
-    ax.set_xlabel(r"q ($\AA^{-1}$)", fontsize=12)
+def _draw_standard_plot(
+    ax: Any,
+    q: np.ndarray,
+    intensity: np.ndarray,
+    title: str = "",
+    exp_data: tuple[np.ndarray, np.ndarray, np.ndarray, float, float] | None = None,
+    ax_res: Any = None,
+) -> None:
+    """Log-linear I(q) vs q plot, optionally with experimental data overlay and residuals."""
+    if exp_data is not None:
+        q_exp, i_exp, err_exp, c, k = exp_data
+
+        # Plot experimental data
+        ax.errorbar(
+            q_exp,
+            i_exp,
+            yerr=err_exp,
+            fmt="ko",
+            markersize=3,
+            alpha=0.5,
+            label="Experimental",
+            zorder=1,
+        )
+
+        # Plot fitted theoretical curve
+        from synth_saxs.fitting import interpolate_profile
+
+        i_calc_interp = interpolate_profile(q_exp, q, intensity)
+        i_fit = c * i_calc_interp + k
+
+        # We also plot the continuous theoretical curve shifted by c and k
+        intensity_scaled = c * intensity + k
+        ax.semilogy(q, intensity_scaled, "r-", linewidth=2, label="Theoretical Fit", zorder=2)
+
+        if ax_res is not None:
+            # Calculate normalized residuals
+            residuals = (i_exp - i_fit) / err_exp
+            ax_res.plot(q_exp, residuals, "k.", markersize=3, alpha=0.5)
+            ax_res.axhline(0, color="r", linestyle="--", linewidth=1)
+            ax_res.set_ylabel(r"$\Delta I / \sigma$", fontsize=12)
+            ax_res.set_xlabel(r"q ($\AA^{-1}$)", fontsize=12)
+            ax_res.grid(True, linestyle="--", alpha=0.5)
+            ax.tick_params(labelbottom=False)  # hide x labels on main plot
+        else:
+            ax.set_xlabel(r"q ($\AA^{-1}$)", fontsize=12)
+    else:
+        ax.semilogy(q, intensity, "b-", linewidth=2, label="Theoretical I(q)")
+        ax.set_xlabel(r"q ($\AA^{-1}$)", fontsize=12)
+
     ax.set_ylabel("log I(q)", fontsize=12)
     ax.set_title(title or "SAXS Intensity Profile", fontsize=13)
     ax.grid(True, which="both", linestyle="--", alpha=0.5)
