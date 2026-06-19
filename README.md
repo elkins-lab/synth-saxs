@@ -166,6 +166,6 @@ If you use synth-saxs in your research, please cite:
   title   = {synth-saxs: SAXS profile simulation from protein coordinates},
   year    = {2026},
   url     = {https://github.com/elkins/synth-saxs},
-  version = {0.1.6}
+  version = {0.1.7}
 }
 ```
