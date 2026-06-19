@@ -514,5 +514,8 @@ def preprocess_structure(
 
     # If the user explicitly wants to drop non-amino/nucleic acids, they can do so themselves.
     # But for a default safe SAXS prep, stripping explicit solvent and common buffers is best.
-    filtered = structure[robust_mask]
+    if isinstance(structure, struc.AtomArrayStack):
+        filtered = structure[:, robust_mask]
+    else:
+        filtered = structure[robust_mask]
     return filtered
