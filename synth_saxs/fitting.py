@@ -30,7 +30,7 @@ def load_experimental_data(filepath: str) -> tuple[np.ndarray, np.ndarray, np.nd
         logger.error(f"Failed to load experimental data from {filepath}: {e}")
         raise ValueError(f"Could not parse experimental data file: {e}")
 
-    if data.shape[1] < 2:
+    if data.ndim < 2 or data.shape[1] < 2:
         raise ValueError("Experimental data must have at least 2 columns (q, I).")
 
     q = data[:, 0]
