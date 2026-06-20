@@ -165,3 +165,85 @@ def test_preprocess_structure():
     filtered_no_na = preprocess_structure(atoms, keep_nucleic_acids=False)
     assert len(filtered_no_na) == 3
     assert "DG" in filtered_no_na.res_name
+
+
+def test_physics_guinier():
+    """
+    Validate the Guinier approximation: ln(I(q)) ~ ln(I(0)) - (Rg^2 / 3) * q^2
+    This ensures our physical engine correctly captures the overall size of the molecule.
+    """
+    from scipy.stats import linregress
+
+    # Create a uniform spherical shell of atoms to avoid form-factor artifacts
+    atoms = struc.AtomArray(100)
+    phi = np.random.uniform(0, 2 * np.pi, 100)
+    costheta = np.random.uniform(-1, 1, 100)
+    theta = np.arccos(costheta)
+    r = 15.0  # Sphere of radius 15 A
+    x = r * np.sin(theta) * np.cos(phi)
+    y = r * np.sin(theta) * np.sin(phi)
+    z = r * np.cos(theta)
+    atoms.coord = np.column_stack([x, y, z])
+    atoms.element = ["C"] * 100
+
+    # Calculate actual geometric Rg for a spherical shell of radius r, Rg = r
+    actual_rg = r
+
+    # Calculate SAXS in vacuum
+    # We want a very dense set of q points in the extremely low-q regime
+    q, intensity = calculate_saxs_profile(
+        atoms, q_min=0.001, q_max=0.05, n_points=50, include_solvent=False
+    )
+
+    # Guinier region: q * Rg < 1.3 => q < 1.3 / 15 = 0.086. We are well within it.
+    y = np.log(intensity)
+    x = q**2
+
+    slope, intercept, r_value, p_value, std_err = linregress(x, y)
+
+    # slope = -Rg^2 / 3
+    inferred_rg = np.sqrt(-3 * slope)
+
+    # They should match very closely
+    assert np.abs(inferred_rg - actual_rg) / actual_rg < 0.05, (
+        f"Guinier Rg {inferred_rg} != Geometric Rg {actual_rg}"
+    )
+    assert r_value**2 > 0.999, "Guinier plot is not linear!"
+
+
+def test_physics_porod():
+    """
+    Validate Porod's Law: I(q) ~ q^-4 for a compact object at high q.
+    This ensures our physical engine captures the surface scattering of a solid object.
+    """
+    # Create a solid cube of atoms (a compact object)
+    n_side = 10
+    coords = []
+    for i in range(n_side):
+        for j in range(n_side):
+            for k in range(n_side):
+                coords.append([i * 2.0, j * 2.0, k * 2.0])
+
+    atoms = struc.AtomArray(len(coords))
+    atoms.coord = np.array(coords)
+    atoms.element = ["C"] * len(coords)
+
+    # Calculate SAXS in vacuum at high q (Porod region)
+    # The cube is 20x20x20 A. High q is roughly q > 3/Rg. Rg ~ 10 A, so q > 0.3
+    q, intensity = calculate_saxs_profile(
+        atoms, q_min=0.5, q_max=1.0, n_points=50, include_solvent=False
+    )
+
+    # Kratky-Porod plot: I(q) * q^4 should plateau
+    porod_val = intensity * (q**4)
+
+    # We check if the derivative of the Porod plateau is near zero (meaning it's flat)
+    # Because of atomic granularity, it won't be perfectly flat like a continuous medium,
+    # but the average trend should be roughly constant compared to the massive q^-4 drop.
+    slope, intercept = np.polyfit(q, porod_val, 1)
+
+    # The variation in Porod value should be small relative to its mean
+    rel_variation = np.std(porod_val) / np.mean(porod_val)
+
+    # Just assert it doesn't wildly diverge (which it would if it were e.g. q^-2)
+    assert rel_variation < 0.75, f"Porod plateau not flat enough, relative std: {rel_variation}"

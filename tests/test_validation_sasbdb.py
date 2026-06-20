@@ -94,6 +94,25 @@ def test_sasbdb_lysozyme_validation():
     _validate_against_sasbdb("1AKI", "SASDAB2")
 
 
+def test_sasbdb_bsa_validation():
+    """
+    Validate against Bovine Serum Albumin (SASDBT4).
+    BSA is a 66 kDa monomeric standard highly cited in SAXS literature.
+    """
+    # The PDB and DAT are both saved under SASDBT4
+    _validate_against_sasbdb("SASDBT4", "SASDBT4")
+
+
+def test_sasbdb_myoglobin_validation():
+    """
+    Validate against Myoglobin (SASDA92).
+    Myoglobin (~17 kDa) is an established monomeric standard in structural biology and SAXS.
+    """
+    _validate_against_sasbdb("SASDA92", "SASDA92")
+
+
 if __name__ == "__main__":
     test_sasbdb_ubiquitin_validation()
     test_sasbdb_lysozyme_validation()
+    test_sasbdb_bsa_validation()
+    test_sasbdb_myoglobin_validation()
