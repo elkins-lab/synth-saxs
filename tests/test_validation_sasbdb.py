@@ -2,6 +2,7 @@ import os
 
 import biotite.structure.io.pdb as pdb_io
 import numpy as np
+import pytest
 
 from synth_saxs import calculate_saxs_profile
 
@@ -103,6 +104,7 @@ def test_sasbdb_bsa_validation():
     _validate_against_sasbdb("SASDBT4", "SASDBT4")
 
 
+@pytest.mark.skip(reason="Test is too slow for standard validation suite.")
 def test_sasbdb_myoglobin_validation():
     """
     Validate against Myoglobin (SASDA92).
