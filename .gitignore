@@ -45,3 +45,4 @@ venv.env/
 
 # Documentation
 site/
+_version.py
