@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documented `synth_saxs.fitting` and `synth_saxs.cli` in `docs/api.md`.
 - Added missing docstring to `cli.main()`.
 
+### Fixed
+- Fixed CI failure by removing `python_version = "3.10"` from mypy config and migrating to `pre-commit` in CI to ensure environment parity with local checks.
+
 ## [0.1.7] - 2026-06-18
 
 ### Added

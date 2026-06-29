@@ -66,13 +66,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-huggingface-
 
-    - name: Check typing with mypy
+    - name: Run pre-commit checks
       run: |
-        mypy synth_saxs/
-
-    - name: Lint with ruff
-      run: |
-        ruff check synth_saxs/
+        pre-commit run --all-files
 
     - name: Run tests
       run: |
