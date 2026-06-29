@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.10] - 2026-06-28
+
+### Fixed
+- Fixed mypy not ignoring the `tests/` directory when executed via pre-commit, which was causing false positive type errors (especially on Windows).
+
 ## [0.1.9] - 2026-06-28
 
 ### Fixed
