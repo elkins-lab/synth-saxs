@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
+    """Main entry point for the synth-saxs command line interface."""
     parser = argparse.ArgumentParser(
         description="synth-saxs: Simulate SAXS profiles from protein coordinates."
     )

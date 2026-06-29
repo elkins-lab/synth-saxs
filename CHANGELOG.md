@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.8] - 2026-06-28
+
+### Added
+- Documented `synth_saxs.fitting` and `synth_saxs.cli` in `docs/api.md`.
+- Added missing docstring to `cli.main()`.
+
 ## [0.1.7] - 2026-06-18
 
 ### Added

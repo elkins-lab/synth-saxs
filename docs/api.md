@@ -15,3 +15,16 @@
       members:
         - plot_saxs_results
         - plot_p_dist
+
+::: synth_saxs.fitting
+    options:
+      members:
+        - load_experimental_data
+        - interpolate_profile
+        - fit_profile
+        - calculate_chi_squared
+
+::: synth_saxs.cli
+    options:
+      members:
+        - main
