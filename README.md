@@ -2,7 +2,7 @@
 
 [![codecov](https://codecov.io/gh/elkins-lab/synth-saxs/branch/main/graph/badge.svg)](https://codecov.io/gh/elkins-lab/synth-saxs)
 [![OpenSSF Best Practices](https://www.bestpractices.dev/projects/13300/badge)](https://www.bestpractices.dev/projects/13300)
-[![PyPI version](https://img.shields.io/pypi/v/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
+[![PyPI version](https://img.shields.io/pypi/v/synth-saxs.svg?cacheBust=1)](https://pypi.org/project/synth-saxs/)
 [![Python](https://img.shields.io/pypi/pyversions/synth-saxs.svg)](https://pypi.org/project/synth-saxs/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.20752799-blue)](https://doi.org/10.5281/zenodo.20752799)
