@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.9] - 2026-06-28
+
+### Fixed
+- Fixed mypy untyped definitions errors in test suite.
+- Fixed trailing whitespace in test data files (1UBQ.pdb).
+
 ## [0.1.8] - 2026-06-28
 
 ### Added
